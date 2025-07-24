@@ -10,7 +10,8 @@ def schedule_room_booking(data):
 
 def check_room_available(input_str):
     try:
-        input_data = json.loads(input_str)
+        print(clean_json_input(input_str))
+        input_data = json.loads(clean_json_input(input_str))
         print("Parsed JSON:")
         print(input_data)
         JWT_TOKEN='eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGeldUN3dja0U5dzVraWRmV180Q0ZLRnB4NlFEV2dkdS1uY0hvcUNRZTBVIn0.eyJleHAiOjE3NTMzNzA2NTcsImlhdCI6MTc1MzMzNDY1NywianRpIjoiODE0NzgwOTItM2U5NC00MWI3LTk5ODUtMTNkOGJjYzhiM2Y2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgxL3JlYWxtcy9Vc2VyU2NoZWR1bGUiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNDg4YTdlZmEtNTUwOC00MzEzLTg5NTMtZWM4M2E1NDZiNmRlIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoidXNlcl9zY2hlZHVsZSIsInNlc3Npb25fc3RhdGUiOiJmZjU1MmVkOS1iZWY0LTQ2OTYtOGMxMC0wMzJlOGZiOTBjMjkiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIioiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwiTUFOQUdFUiIsInVtYV9hdXRob3JpemF0aW9uIiwiQURNSU4iLCJVU0VSIiwiZGVmYXVsdC1yb2xlcy11c2Vyc2NoZWR1bGUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZmY1NTJlZDktYmVmNC00Njk2LThjMTAtMDMyZThmYjkwYzI5IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoiMTIzMTIzIERvZSIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluIiwiZ2l2ZW5fbmFtZSI6IjEyMzEyMyIsImZhbWlseV9uYW1lIjoiRG9lIiwiZW1haWwiOiJzYXJhaEBleGFtcGxlLmNvbSJ9.eiBivQQQdkDUyG0PSzlTW3EplmkPQjnRS8WfRw9NvGmp7FpNY3luElHECcCqXtodcqudPjKvZRY6X74UEcWngrAGatDZ7Uv5wgL9eU8FVN8h724jm-2RXL3CtlVY-QUjKGEk6_tCwpic6O1Vy8lk8HITjVOT24x3ba4vqhTjCPwmHCqLxhWgjcjz3C0A-eontoYIbmx2DmEUoHIyFzKwylB4vx7MSazBgV9b-hIqfXEavlwdoD0YPT5hD_8jMqHqoKmD7wyQYbQJEYIfYGZOxfQsXsE4n5fomNiacf8-7vCG2j6xZbb2yCiD1U-NDVuvPR2VjLzzJWeMKJxyqtCh0g'
@@ -28,7 +29,7 @@ def check_room_available(input_str):
 
 def check_free_time_range_room(input_str):
     try:
-        input_data = json.loads(input_str)
+        input_data = json.loads(clean_json_input(input_str))
         print("Parsed JSON:")
         print(input_data)
 
@@ -60,6 +61,20 @@ def check_free_time_range_room(input_str):
         print("Missing required field in input:", e)
         return []
         
+
+def clean_json_input(raw: str) -> str:
+    lines = raw.strip().splitlines()
+    
+    # Nếu dòng đầu tiên là ``` hoặc ```json → bỏ
+    if lines and lines[0].strip().startswith("```"):
+        lines = lines[1:]
+    
+    # Nếu dòng cuối là ```
+    if lines and lines[-1].strip() == "```":
+        lines = lines[:-1]
+    
+    return "\n".join(lines).strip()
+
 tools = [
     Tool(
         name="ScheduleRoomBooking",
