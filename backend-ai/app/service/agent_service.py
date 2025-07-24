@@ -1,5 +1,5 @@
 # services/user_service.py
-from app.core.my_injector import service
+from app.core import service
 from config import *
 from langchain_together import ChatTogether
 import json
@@ -18,7 +18,8 @@ class AgentService:
             llm=self.llm,
             agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
             verbose=True,
-            max_iterations=5
+            max_iterations=5,
+            handle_parsing_errors=True
         )
     def chat(self, conversation):
-        return self.agent.invoke(create_prompt(conversation))
+        return self.agent.invoke(create_prompt(conversation))['output']

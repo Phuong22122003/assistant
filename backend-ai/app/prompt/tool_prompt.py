@@ -21,11 +21,12 @@ Use this tool to check which rooms are available during a specific time range.
 Required input (JSON format):
 - from: ISO datetime string (e.g., "2025-07-29T00:00:00")
 - to: ISO datetime string (e.g., "2025-07-29T23:59:59")
-
+- keycloak_id: ...
 Example input:
 {{
   "from": "2025-07-29T00:00:00",
-  "to": "2025-07-29T23:59:59"
+  "to": "2025-07-29T23:59:59",
+  "keycloak_id":"..."
 }}
 
 Output:
@@ -47,6 +48,8 @@ Required input (JSON format):
 - roomName: string (e.g., "Room A")
 - from: ISO datetime string (e.g., "2025-07-29T00:00:00")
 - to: ISO datetime string (e.g., "2025-07-29T23:59:59")
+- keycloak_id: ...
+
 
 Example input:
 {{
@@ -65,6 +68,24 @@ A list of **available time ranges** (when the room is free) in the following for
   {{
     "startTime": "2025-07-29T10:30:00",
     "endTime": "2025-07-29T13:00:00"
+  }},
+  ...
+]
+"""
+get_all_rooms_prompt = """
+Use this tool to retrieve a list of all rooms.
+Input: 
+{{
+  "keycloak_id":"..."
+}}
+Output:
+A list of rooms in the following format:
+[
+  {{
+    "name": "string",
+    "location": "string",
+    "capacity": 1073741824,
+    "jwt: "..."
   }},
   ...
 ]
