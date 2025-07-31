@@ -90,3 +90,35 @@ A list of rooms in the following format:
   ...
 ]
 """
+
+create_simple_schedule_prompt = """
+Use this tool to **create a simple schedule** (without participants or departments).
+
+Required input (JSON format):
+- title: string (e.g., "Weekly Meeting")
+- type: "ONLINE" or "OFFLINE"
+- startTime: ISO format datetime (e.g., "2025-07-25T14:00:00")
+- endTime: ISO format datetime (e.g., "2025-07-25T15:00:00")
+- roomName: string (required **only if type is OFFLINE**)
+
+Example (OFFLINE):
+{{
+  "title": "Team sync-up",
+  "type": "OFFLINE",
+  "startTime": "2025-07-26T10:00:00",
+  "endTime": "2025-07-26T11:00:00",
+  "roomName": "Room A"
+}}
+
+Example (ONLINE):
+{{
+  "title": "Remote training",
+  "type": "ONLINE",
+  "startTime": "2025-07-26T09:00:00",
+  "endTime": "2025-07-26T10:30:00"
+}}
+
+Output:
+A confirmation message with the created schedule information, including schedule ID, owner, time, and room.
+"""
+

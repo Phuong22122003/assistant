@@ -84,6 +84,40 @@ def get_all_rooms(input_str):
     except json.JSONDecodeError as e:
         print("Invalid JSON format:", e)
 
+def schedule_room_booking(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        print("Parsed schedule request:", input_data)
+        keycloak_id =input_data['keycloak_id']
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN is not None:
+            JWT_TOKEN = JWT_TOKEN.decode('utf-8')
+        payload = {
+            "title": input_data["title"],
+            "type": input_data["type"].upper(),
+            "startTime": input_data["startTime"],
+            "endTime": input_data["endTime"]
+        }
+
+        if payload["type"] == "OFFLINE":
+            payload["roomName"] = input_data["roomName"]
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/simple"
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            return "✅ Schedule created successfully."
+        else:
+            return f"❌ Failed to create schedule: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
 def clean_json_input(raw: str) -> str:
     lines = raw.strip().splitlines()
     
@@ -127,6 +161,11 @@ tools = [
         description= '''
         this function help to get current time with output format is %Y-%m-%dT%H:%M:%S'''
     ),
+    Tool(
+    name="ScheduleRoomBooking",
+    func=schedule_room_booking,
+    description=create_simple_schedule_prompt
+)
 ]
 
 

@@ -6,6 +6,7 @@ Important:
 - If required info is missing, ask the user to clarify if you need.
     or using tools to get more info and use this info instead of asking user before calling the tool.
 - To clarify info. you need to return final answer that is you question.
+- if user book a room which is booked, ask to confirm book another room.
 ---
 Begin the conversation below:
 {conversation}
