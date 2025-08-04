@@ -84,7 +84,7 @@ def get_all_rooms(input_str):
     except json.JSONDecodeError as e:
         print("Invalid JSON format:", e)
 
-def schedule_room_booking(input_str: str):
+def schedule_room_booking(input_str: str): 
     try:
         input_data = json.loads(clean_json_input(input_str))
         print("Parsed schedule request:", input_data)
@@ -116,6 +116,101 @@ def schedule_room_booking(input_str: str):
 
     except Exception as e:
         return f"❌ Error: {str(e)}"
+
+def get_conflict_schedule_info(input_str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data['keycloak_id']
+        start_time = input_data['from']
+        end_time = input_data['to']
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN is not None:
+            JWT_TOKEN = JWT_TOKEN.decode('utf-8')
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/conflicts?startTime={start_time}&endTime={end_time}"
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json().get("data", [])
+            if not data:
+                return "✅ Không có lịch nào bị trùng trong khoảng thời gian này."
+            return json.dumps(data, indent=2, ensure_ascii=False)
+        else:
+            return f"❌ API call failed: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi khi gọi get_conflict_schedule_info: {str(e)}"
+
+def get_department_conflict_users(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data['keycloak_id']
+        department_name = input_data['departmentName']
+        start_time = input_data['startTime']
+        end_time = input_data['endTime']
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN:
+            JWT_TOKEN = JWT_TOKEN.decode('utf-8')
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/conflicts?departmentName={department_name}&startTime={start_time}&endTime={end_time}"
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json().get("data", [])
+            if not data:
+                return "✅ Không có người nào bị trùng lịch trong phòng ban."
+            return f"⚠️ Các user bị conflict: \n{json.dumps(data, indent=2, ensure_ascii=False)}"
+        else:
+            return f"❌ API lỗi: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi trong get_department_conflict_users: {str(e)}"
+    
+def create_schedule_for_department(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data['keycloak_id']
+        department_name = input_data['departmentName']
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN:
+            JWT_TOKEN = JWT_TOKEN.decode('utf-8')
+
+        payload = {
+            "title": input_data["title"],
+            "type": input_data["type"].upper(),
+            "startTime": input_data["startTime"],
+            "endTime": input_data["endTime"]
+        }
+
+        if payload["type"] == "OFFLINE":
+            payload["roomName"] = input_data["roomName"]
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/departments/{department_name}"
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            return "✅ Lịch họp đã được tạo thành công cho phòng ban."
+        else:
+            return f"❌ Không thể tạo lịch: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi trong create_schedule_for_department: {str(e)}"
 
 
 def clean_json_input(raw: str) -> str:
@@ -155,18 +250,34 @@ tools = [
         func= get_all_rooms,
         description= get_all_rooms_prompt
     ),
-        Tool(
+    Tool(
         name="GetCurrentTime",
         func=get_current_time,
         description= '''
         this function help to get current time with output format is %Y-%m-%dT%H:%M:%S'''
     ),
     Tool(
-    name="ScheduleRoomBooking",
-    func=schedule_room_booking,
-    description=create_simple_schedule_prompt
-)
+        name="ScheduleRoomBooking",
+        func=schedule_room_booking,
+        description=create_simple_schedule_prompt
+    ),
+    Tool(
+        name="GetConflictScheduleInfo",
+        func=get_conflict_schedule_info,
+        description=conflict_schedule_info_prompt
+    ),
+    Tool(
+        name="GetDepartmentConflictUsers",
+        func=get_department_conflict_users,
+        description=department_conflict_users_prompt
+    ),
+    Tool(
+        name="CreateScheduleForDepartment",
+        func=create_schedule_for_department,
+        description=create_department_schedule_prompt
+    )
 ]
+
 
 
 # Phòng A chiều nay còn trống không. -> agent trả về kết quả 

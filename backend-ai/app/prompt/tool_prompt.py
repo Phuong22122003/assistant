@@ -122,3 +122,91 @@ Output:
 A confirmation message with the created schedule information, including schedule ID, owner, time, and room.
 """
 
+conflict_schedule_info_prompt = """
+Use this tool when the user tries to book a room but no rooms are available during the requested time range.
+This tool will call an API to retrieve the list of existing room bookings that overlap with the given time range.
+Each returned item includes the room name, full name of the user who booked it, their email, and the booked time range.
+You can suggest the user to contact one of these users to negotiate a reschedule.
+
+**Input format (JSON):**
+{{
+  "keycloak_id": "<user's keycloak ID>",
+  "from": "YYYY-MM-DDTHH:MM:SS",
+  "to": "YYYY-MM-DDTHH:MM:SS"
+}}
+
+**Output:**
+- If conflicts exist, return a list of objects like:
+[
+  {{
+    "roomName": "Room A",
+    "fullName": "Nguyen Van A",
+    "email": "abc@example.com",
+    "startTime": "2025-08-05T14:00:00",
+    "endTime": "2025-08-05T16:00:00"
+  }},
+  ...
+]
+- If no conflicts, return a message like:
+✅ No conflicting bookings found within the given time range.
+"""
+
+department_conflict_users_prompt = """
+Use this tool when the user wants to create a schedule for a department and you need to check if any members in that department have conflicting schedules within a given time range.
+This tool will call an API using query parameters to retrieve the list of users in the specified department who are unavailable (i.e., have scheduling conflicts) during the requested time range.
+
+**Input format (Query Parameters):**
+- departmentName: <name of the department>
+- startTime: YYYY-MM-DDTHH:MM:SS
+- endTime: YYYY-MM-DDTHH:MM:SS
+
+**Output:**
+- If conflicting users exist, return a list of user objects like:
+[
+  {{
+      "lastName": "Nguyen Van",
+      "firstName": "A",
+      "email": "a@example.com",
+  }},
+  ...
+]
+
+  Then inform the user that some members in the department already have schedules during the selected time range. Suggest that they:
+  - Contact these users to negotiate a reschedule, **or**
+  - Proceed to create the department schedule while being aware that those users may be unavailable.
+
+- If no conflicts are found, return:
+✅ No conflicting users found in the department within the given time range.
+"""
+
+
+
+create_department_schedule_prompt = """
+Use this tool **only after** you have used the `GetDepartmentConflictUsers` tool to check for scheduling conflicts.
+If there are any conflicting users in the department during the specified time, do not proceed with this tool and instead inform the user.
+
+This tool will create a schedule for an entire department using the department name (as a path parameter) and the schedule details (as a JSON body).
+
+**Important:** 
+- Always call `GetDepartmentConflictUsers` first with the same `departmentName`, `startTime`, and `endTime` to ensure no one in the department has a conflicting schedule.
+- Proceed with this tool only if `GetDepartmentConflictUsers` confirms ✅ no conflicting users.
+
+**Input format:**
+- Path:
+  - departmentName (string): The name of the department for which the schedule is being created.
+
+- Body (JSON):
+{{
+  "title": "<Title of the schedule>",
+  "type": "<ONLINE | OFFLINE>",
+  "startTime": "YYYY-MM-DDTHH:MM:SS",
+  "endTime": "YYYY-MM-DDTHH:MM:SS",
+  "roomName": "<Room name (required only if type is OFFLINE, leave empty for ONLINE)>"
+}}
+
+**Output:**
+- If creation is successful, return a confirmation message along with the created schedule details.
+- If the room is already booked (for OFFLINE type), return a message that the room is unavailable during that time.
+- If the department does not exist or the user is unauthorized, return an appropriate error message.
+"""
+
