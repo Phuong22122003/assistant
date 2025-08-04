@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, request
 from app.core import inject
 from app.service import AgentService
+import requests
 import redis
 r = redis.Redis(host='localhost', port=6379, db=0)
 bp = Blueprint('users', __name__)
@@ -10,9 +11,8 @@ bp = Blueprint('users', __name__)
 @inject
 def chat(agent_service: AgentService):
     data = request.get_json()
-    conversation = data.get('message')
+    conversation = data.get('conversation')
     keycloak_id  = data.get('keycloakId')
-    print('keycloak_id',keycloak_id)
     
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
@@ -22,4 +22,15 @@ def chat(agent_service: AgentService):
         return jsonify({'error': 'Missing "conversation" field in request body'}), 400
 
     conversation +=f"\nkeycloak_id: {keycloak_id}"
-    return jsonify({'agent': agent_service.chat(conversation)})
+    ai_message = agent_service.chat(conversation)
+
+    # Gửi kết quả tới Spring Boot
+    try:
+        callback_url = f"http://localhost:8080/ai-agent/sse/callback?keycloakId={keycloak_id}"
+        response = requests.post(callback_url, json={"aiMessage": ai_message})
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print("Callback failed:", e)
+        return jsonify({'error': 'Failed to send AI response to callback'}), 500
+
+    return jsonify({'status': 'sent to callback'})
