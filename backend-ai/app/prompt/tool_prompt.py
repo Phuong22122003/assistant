@@ -11,6 +11,7 @@ Example input:
   "room_id": "room-a",
   "from": "2025-07-29T14:00:00",
   "to": "2025-07-29T16:00:00"
+  "keycloak_id":"..."
 }}
 
 The tool returns a confirmation message indicating whether the booking was successful.
@@ -55,7 +56,8 @@ Example input:
 {{
   "roomName": "Room A",
   "from": "2025-07-29T00:00:00",
-  "to": "2025-07-29T23:59:59"
+  "to": "2025-07-29T23:59:59",
+  "keycloak_id":"..."
 }}
 
 Output:
@@ -210,3 +212,62 @@ This tool will create a schedule for an entire department using the department n
 - If the department does not exist or the user is unauthorized, return an appropriate error message.
 """
 
+update_schedule_by_room_and_time_prompt = """
+Use this tool to **update a schedule** based on its `roomName` and `startTime`.
+
+**Input format:**
+
+- Query Parameters:
+  - roomName: <Name of the room>
+  - startTime: YYYY-MM-DDTHH:MM:SS (e.g., "2025-08-06T08:00:00")
+
+- Body (JSON):
+{{
+  "title": "<New title if updating>",
+  "newStartTime": "YYYY-MM-DDTHH:MM:SS",
+  "endTime": "YYYY-MM-DDTHH:MM:SS",
+  "type": "<ONLINE | OFFLINE>",
+  "roomName": "<New room name if changing location>"
+}}
+
+**Agent Instructions:**
+- Ask for `roomName` and `startTime` if the user doesn't provide them.
+- Only include fields in the body that the user **wants to change**.
+- If the user changes the type to `"OFFLINE"` but doesn’t provide `roomName`, ask for it.
+- Ensure all datetime fields follow ISO format.
+- Confirm the updated fields after success.
+"""
+
+delete_schedule_by_room_and_time_prompt = """
+Use this tool to **delete a schedule** using its room name and start time.
+
+**Input format:**
+
+- Query Parameters:
+  - roomName: <Name of the room>
+  - startTime: YYYY-MM-DDTHH:MM:SS (e.g., "2025-08-06T08:00:00")
+
+**Agent Instructions:**
+- Ask for `roomName` and `startTime` if either is missing.
+- Validate that `startTime` is in ISO format.
+- Ignore extra information like title, participants, or room capacity.
+- Respond with confirmation of deletion or a message if the schedule doesn't exist.
+"""
+
+read_company_policy_prompt = """
+Use this tool to **retrieve the company's policy document**, which contains details about working hours, remote work policy, company culture, internal support channels, and leadership roles.
+
+**Agent Instructions:**
+- Call this endpoint to get the full content of the company's internal policy.
+- Use this content to answer questions like:
+  - "Giờ làm việc của công ty là gì?"
+  - "Công ty có cho làm việc từ xa không?"
+  - "Văn hoá công ty như thế nào?"
+  - "Tôi liên hệ ai khi có vấn đề về nhân sự?"
+  - "CEO là ai?" hoặc "Tổng giám đốc là ai?"
+
+**Important Notes:**
+- Do not hallucinate answers. Always extract facts from the returned policy content.
+- If the user asks about something **not mentioned** in the policy, respond with: `"Thông tin này hiện không có trong tài liệu quy định của công ty."`
+- If the policy content hasn't been loaded yet, call the endpoint immediately.
+"""

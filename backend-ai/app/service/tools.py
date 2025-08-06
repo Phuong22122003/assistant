@@ -212,6 +212,118 @@ def create_schedule_for_department(input_str: str):
     except Exception as e:
         return f"❌ Lỗi trong create_schedule_for_department: {str(e)}"
 
+def update_schedule_by_room_and_start_time(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data["keycloak_id"]
+        room_name = input_data["roomName"]
+        start_time = input_data["startTime"]
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN:
+            JWT_TOKEN = JWT_TOKEN.decode("utf-8")
+
+        # Các trường có thể được cập nhật
+        payload = {}
+        if "title" in input_data:
+            payload["title"] = input_data["title"]
+        if "type" in input_data:
+            payload["type"] = input_data["type"].upper()
+        if "roomName" in input_data:
+            payload["roomName"] = input_data["roomName"]
+        if "newStartTime" in input_data:
+            payload["startTime"] = input_data["newStartTime"]
+        if "endTime" in input_data:
+            payload["endTime"] = input_data["endTime"]
+
+        if not payload:
+            return "⚠️ Bạn cần cung cấp ít nhất một trường để cập nhật (title, type, endTime)."
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            "Content-Type": "application/json"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/by-room-start"
+        params = {
+            "roomName": room_name,
+            "startTime": start_time
+        }
+
+        response = requests.patch(url, headers=headers, params=params, json=payload)
+
+        if response.status_code == 200:
+            return "✅ Lịch họp đã được cập nhật thành công."
+        elif response.status_code == 404:
+            return "⚠️ Không tìm thấy lịch họp để cập nhật."
+        else:
+            return f"❌ Lỗi khi cập nhật lịch họp: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi trong update_schedule_by_room_and_start_time: {str(e)}"
+
+
+def delete_schedule_by_room_and_start_time(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data["keycloak_id"]
+        room_name = input_data["roomName"]
+        start_time = input_data["startTime"]
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN:
+            JWT_TOKEN = JWT_TOKEN.decode("utf-8")
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}"
+        }
+
+        url = f"{SCHEDULE_API}/schedules/by-room-and-time"
+        params = {
+            "roomName": room_name,
+            "startTime": start_time
+        }
+
+        response = requests.delete(url, headers=headers, params=params)
+
+        if response.status_code == 200:
+            return "🗑️ Lịch họp đã được xoá thành công."
+        elif response.status_code == 404:
+            return "⚠️ Không tìm thấy lịch để xoá."
+        else:
+            return f"❌ Lỗi khi xoá lịch: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi trong delete_schedule_by_room_and_start_time: {str(e)}"
+
+def read_company_policy(input_str: str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id = input_data["keycloak_id"]
+
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN:
+            JWT_TOKEN = JWT_TOKEN.decode("utf-8")
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}"
+        }
+
+        url = f"{SCHEDULE_API}/documents/company-culture"
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            return response.text  # Trả về nội dung file Word đã được convert thành string
+        elif response.status_code == 404:
+            return "⚠️ Không tìm thấy tài liệu quy định công ty."
+        else:
+            return f"❌ Lỗi khi truy xuất tài liệu: {response.status_code} - {response.text}"
+
+    except Exception as e:
+        return f"❌ Lỗi trong read_company_policy: {str(e)}"
+
+
 
 def clean_json_input(raw: str) -> str:
     lines = raw.strip().splitlines()
@@ -275,6 +387,21 @@ tools = [
         name="CreateScheduleForDepartment",
         func=create_schedule_for_department,
         description=create_department_schedule_prompt
+    ),
+    Tool(
+        name="UpdateScheduleByRoomAndTime",
+        func=update_schedule_by_room_and_start_time,
+        description=update_schedule_by_room_and_time_prompt
+    ),
+    Tool(
+        name="DeleteScheduleByRoomAndTime", 
+        func=delete_schedule_by_room_and_start_time,
+        description=delete_schedule_by_room_and_time_prompt
+    ),
+    Tool(
+        name="GetCompanyPolicy",
+        func=read_company_policy,
+        description=read_company_policy_prompt
     )
 ]
 
