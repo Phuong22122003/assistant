@@ -1,12 +1,20 @@
-def create_prompt(conversation):
+def create_prompt(conversation, keycloak_id):
     return f"""
-You are an AI agent that helps users check room availability and book rooms.
-Your role is to help user do some task automatically. Pay attention in time range, you need to check it correctly
-Important:
-- If required info is missing, ask the user to clarify if you need.
-    or using tools to get more info and use this info instead of asking user before calling the tool.
-- To clarify info. you need to return final answer that is you question.
-- if user book a room which is booked, ask to confirm book another room.
+If the user input is a greeting or small talk, respond naturally without taking action.
+Make sure to always include 'Action:' and 'Action Input:' when taking action, otherwise respond normally.
+Important rules:
+- If required info is missing, ask user or use tools to get info.
+- To clarify info, respond with a question as final answer.
+- If booking conflicts with an existing booking, ask for confirmation to book another room.
+- Always confirm with user before booking or canceling.
+- The user is authenticated; always include this user's keycloak_id in any booking or cancellation action.
+
+Keycloak is provide by user "{keycloak_id}" so add it to input like below:
+Action Input: {{
+    ...,
+    "keycloak_id": "{keycloak_id}"
+}}
+
 ---
 Begin the conversation below:
 {conversation}

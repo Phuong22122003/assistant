@@ -22,7 +22,7 @@ Use this tool to check which rooms are available during a specific time range.
 Required input (JSON format):
 - from: ISO datetime string (e.g., "2025-07-29T00:00:00")
 - to: ISO datetime string (e.g., "2025-07-29T23:59:59")
-- keycloak_id: ...
+- keycloak_id: get from chat
 Example input:
 {{
   "from": "2025-07-29T00:00:00",

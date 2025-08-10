@@ -6,12 +6,8 @@ from config import *
 import redis
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-
-def schedule_room_booking(data):
-    print(data)
-    return 'Book successfully'
-
 def check_room_available(input_str):
+    print(input_str)
     try:
         input_data = json.loads(clean_json_input(input_str))
         keycloak_id =input_data['keycloak_id']
@@ -26,8 +22,8 @@ def check_room_available(input_str):
         json_data = response.json()  # Parse response JSON
 
         return str(json_data)
-    except json.JSONDecodeError as e:
-        print("Invalid JSON format:", e)
+    except Exception as e:
+         return f" Error: {str(e)}"
 
 def check_free_time_range_room(input_str):
     try:
@@ -110,12 +106,12 @@ def schedule_room_booking(input_str: str):
         response = requests.post(url, headers=headers, json=payload)
 
         if response.status_code == 200:
-            return "✅ Schedule created successfully."
+            return " Schedule created successfully."
         else:
-            return f"❌ Failed to create schedule: {response.status_code} - {response.text}"
+            return f" Failed to create schedule: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f" Error: {str(e)}"
 
 def get_conflict_schedule_info(input_str):
     try:
@@ -138,13 +134,13 @@ def get_conflict_schedule_info(input_str):
         if response.status_code == 200:
             data = response.json().get("data", [])
             if not data:
-                return "✅ Không có lịch nào bị trùng trong khoảng thời gian này."
+                return " Không có lịch nào bị trùng trong khoảng thời gian này."
             return json.dumps(data, indent=2, ensure_ascii=False)
         else:
-            return f"❌ API call failed: {response.status_code} - {response.text}"
+            return f" API call failed: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi khi gọi get_conflict_schedule_info: {str(e)}"
+        return f" Lỗi khi gọi get_conflict_schedule_info: {str(e)}"
 
 def get_department_conflict_users(input_str: str):
     try:
@@ -168,13 +164,13 @@ def get_department_conflict_users(input_str: str):
         if response.status_code == 200:
             data = response.json().get("data", [])
             if not data:
-                return "✅ Không có người nào bị trùng lịch trong phòng ban."
-            return f"⚠️ Các user bị conflict: \n{json.dumps(data, indent=2, ensure_ascii=False)}"
+                return " Không có người nào bị trùng lịch trong phòng ban."
+            return f" Các user bị conflict: \n{json.dumps(data, indent=2, ensure_ascii=False)}"
         else:
-            return f"❌ API lỗi: {response.status_code} - {response.text}"
+            return f" API lỗi: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi trong get_department_conflict_users: {str(e)}"
+        return f" Lỗi trong get_department_conflict_users: {str(e)}"
     
 def create_schedule_for_department(input_str: str):
     try:
@@ -205,12 +201,12 @@ def create_schedule_for_department(input_str: str):
         response = requests.post(url, headers=headers, json=payload)
 
         if response.status_code == 200:
-            return "✅ Lịch họp đã được tạo thành công cho phòng ban."
+            return " Lịch họp đã được tạo thành công cho phòng ban."
         else:
-            return f"❌ Không thể tạo lịch: {response.status_code} - {response.text}"
+            return f" Không thể tạo lịch: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi trong create_schedule_for_department: {str(e)}"
+        return f" Lỗi trong create_schedule_for_department: {str(e)}"
 
 def update_schedule_by_room_and_start_time(input_str: str):
     try:
@@ -237,7 +233,7 @@ def update_schedule_by_room_and_start_time(input_str: str):
             payload["endTime"] = input_data["endTime"]
 
         if not payload:
-            return "⚠️ Bạn cần cung cấp ít nhất một trường để cập nhật (title, type, endTime)."
+            return " Bạn cần cung cấp ít nhất một trường để cập nhật (title, type, endTime)."
 
         headers = {
             "Authorization": f"Bearer {JWT_TOKEN}",
@@ -253,14 +249,14 @@ def update_schedule_by_room_and_start_time(input_str: str):
         response = requests.patch(url, headers=headers, params=params, json=payload)
 
         if response.status_code == 200:
-            return "✅ Lịch họp đã được cập nhật thành công."
+            return " Lịch họp đã được cập nhật thành công."
         elif response.status_code == 404:
-            return "⚠️ Không tìm thấy lịch họp để cập nhật."
+            return " Không tìm thấy lịch họp để cập nhật."
         else:
-            return f"❌ Lỗi khi cập nhật lịch họp: {response.status_code} - {response.text}"
+            return f" Lỗi khi cập nhật lịch họp: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi trong update_schedule_by_room_and_start_time: {str(e)}"
+        return f" Lỗi trong update_schedule_by_room_and_start_time: {str(e)}"
 
 
 def delete_schedule_by_room_and_start_time(input_str: str):
@@ -287,14 +283,14 @@ def delete_schedule_by_room_and_start_time(input_str: str):
         response = requests.delete(url, headers=headers, params=params)
 
         if response.status_code == 200:
-            return "🗑️ Lịch họp đã được xoá thành công."
+            return " Lịch họp đã được xoá thành công."
         elif response.status_code == 404:
-            return "⚠️ Không tìm thấy lịch để xoá."
+            return " Không tìm thấy lịch để xoá."
         else:
-            return f"❌ Lỗi khi xoá lịch: {response.status_code} - {response.text}"
+            return f" Lỗi khi xoá lịch: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi trong delete_schedule_by_room_and_start_time: {str(e)}"
+        return f" Lỗi trong delete_schedule_by_room_and_start_time: {str(e)}"
 
 def read_company_policy(input_str: str):
     try:
@@ -316,12 +312,12 @@ def read_company_policy(input_str: str):
         if response.status_code == 200:
             return response.text  # Trả về nội dung file Word đã được convert thành string
         elif response.status_code == 404:
-            return "⚠️ Không tìm thấy tài liệu quy định công ty."
+            return " Không tìm thấy tài liệu quy định công ty."
         else:
-            return f"❌ Lỗi khi truy xuất tài liệu: {response.status_code} - {response.text}"
+            return f" Lỗi khi truy xuất tài liệu: {response.status_code} - {response.text}"
 
     except Exception as e:
-        return f"❌ Lỗi trong read_company_policy: {str(e)}"
+        return f" Lỗi trong read_company_policy: {str(e)}"
 
 
 
@@ -342,11 +338,6 @@ def get_current_time(input_str=None):
     return datetime.now().strftime("%A, %d %B %Y, %H:%M:%S")
 
 tools = [
-    Tool(
-        name="ScheduleRoomBooking",
-        func=schedule_room_booking,
-        description= schedule_room_booking_prompt 
-    ),
     Tool(
         name="CheckRoomAvailable",
         func= check_room_available,
@@ -404,14 +395,3 @@ tools = [
         description=read_company_policy_prompt
     )
 ]
-
-
-
-# Phòng A chiều nay còn trống không. -> agent trả về kết quả 
-# Phòng A này hiện tại trống không. -> agent trả lại kết quả
-# Tôi đang cần 1 phòng trống vào chiều thứ 5 để họp -> hỏi lại thứ 5 tuần nào
-# tôi cần 1 phòng trống thứ 5 tuần này thì có không -> check rồi trả về
-# đặt cho tôi 1 phòng vào thứ 5 tuần này đi -> hỏi lại phòng a trống vào thứ 5 bạn có muốn đặt không. có -> đặt ko tìm phòng khác
-# Dời lịch phòng A chiều thứ 5 tuần này sang thứ 6 được ko. -> check
-# Tìm phòng nào đủ lớn để họp nhiều người. -> trả phòng + số người hỏi có đồng ý không.
-# Phòng A này trống vào thứ mấy. 

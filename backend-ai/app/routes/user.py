@@ -21,8 +21,7 @@ def chat(agent_service: AgentService):
     if conversation is None:
         return jsonify({'error': 'Missing "conversation" field in request body'}), 400
 
-    conversation +=f"\nkeycloak_id: {keycloak_id}"
-    ai_message = agent_service.chat(conversation)
+    ai_message = agent_service.chat(conversation,keycloak_id)
 
     # Gửi kết quả tới Spring Boot
     try:
