@@ -10,16 +10,10 @@ from .lmstudio import LMStudioLLM
 @service
 class AgentService:
     def __init__(self):
-        # self.llm =  ChatTogether(
-        #     together_api_key= API_KEY,
-        #     model=LLM_MODEL_NAME
-        # )
         self.llm = LMStudioLLM(
             api_key=API_KEY,
-            base_url="http://localhost:1234/v1",
-            model_name="google/gemma-3-4b"
+            model_name=LLM_MODEL_NAME
         )
-
 
         self.agent = initialize_agent(
             tools=tools,

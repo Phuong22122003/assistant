@@ -150,7 +150,7 @@ You can suggest the user to contact one of these users to negotiate a reschedule
   ...
 ]
 - If no conflicts, return a message like:
-✅ No conflicting bookings found within the given time range.
+  No conflicting bookings found within the given time range.
 """
 
 department_conflict_users_prompt = """
@@ -178,7 +178,7 @@ This tool will call an API using query parameters to retrieve the list of users 
   - Proceed to create the department schedule while being aware that those users may be unavailable.
 
 - If no conflicts are found, return:
-✅ No conflicting users found in the department within the given time range.
+ No conflicting users found in the department within the given time range.
 """
 
 
@@ -191,7 +191,7 @@ This tool will create a schedule for an entire department using the department n
 
 **Important:** 
 - Always call `GetDepartmentConflictUsers` first with the same `departmentName`, `startTime`, and `endTime` to ensure no one in the department has a conflicting schedule.
-- Proceed with this tool only if `GetDepartmentConflictUsers` confirms ✅ no conflicting users.
+- Proceed with this tool only if `GetDepartmentConflictUsers` confirms  no conflicting users.
 
 **Input format:**
 - Path:

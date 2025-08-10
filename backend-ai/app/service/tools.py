@@ -23,7 +23,8 @@ def check_room_available(input_str):
 
         return str(json_data)
     except Exception as e:
-         return f" Error: {str(e)}"
+        print(e)
+        return f" Error: {str(e)}"
 
 def check_free_time_range_room(input_str):
     try:
