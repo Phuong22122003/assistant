@@ -7,7 +7,6 @@ import redis
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 def check_room_available(input_str):
-    print(input_str)
     try:
         input_data = json.loads(clean_json_input(input_str))
         keycloak_id =input_data['keycloak_id']

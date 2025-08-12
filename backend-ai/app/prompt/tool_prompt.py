@@ -257,6 +257,9 @@ Use this tool to **delete a schedule** using its room name and start time.
 read_company_policy_prompt = """
 Use this tool to **retrieve the company's policy document**, which contains details about working hours, remote work policy, company culture, internal support channels, and leadership roles.
 
+{{
+  "keycloak_id": "<user's keycloak ID>"
+}}
 **Agent Instructions:**
 - Call this endpoint to get the full content of the company's internal policy.
 - Use this content to answer questions like:
