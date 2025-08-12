@@ -357,8 +357,12 @@ tools = [
     Tool(
         name="GetCurrentTime",
         func=get_current_time,
-        description= '''
-        this function help to get current time with output format is %Y-%m-%dT%H:%M:%S'''
+        description='''
+        Retrieves the current system date and time in the format "%Y-%m-%dT%H:%M:%S".
+        Input: null (pass None as input).
+        Use this tool whenever you need to resolve relative date/time expressions 
+        like "tomorrow", "next week", "this month", etc. into an exact date/time.
+        '''
     ),
     Tool(
         name="ScheduleRoomBooking",

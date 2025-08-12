@@ -10,7 +10,7 @@ class LMStudioLLM(LLM):
 
     def __init__(self,**data):
         super().__init__(**data)
-        self._client = genai.Client(api_key="AIzaSyC25KhSrP9q6CPmGppr44vUVZASFXFsR6g")
+        self._client = genai.Client(api_key=self.api_key)
     @property
     def _llm_type(self) -> str:
         return "lm_studio"

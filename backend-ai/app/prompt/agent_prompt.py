@@ -16,6 +16,10 @@ Thought: I now know the final answer
 Final Answer: <your response to the user>
 
 --- IMPORTANT RULES ---
+- In a single turn, you must do either:
+  (a) Call a tool (Thought + Action + Action Input) → DO NOT include Final Answer.
+  (b) Respond to the user (Thought + Final Answer) → DO NOT include Action or Action Input.
+  Never mix tool calls and Final Answer in the same turn.
 - Only use tools from the provided list.
 - Action Input must be valid JSON and include all required parameters.
 - Do not fabricate data. If information is missing, ask the user using "Final Answer:".
@@ -25,6 +29,8 @@ Final Answer: <your response>
 - Absolutely do not add any extra words or characters outside the above format.
 - Do not call a tool again if you already have enough information to answer.
 - Do not fabricate or assume data; only use data returned by tools.
+- If the user's request involves booking a room or cancelling a booking, 
+  you MUST confirm with the user (using Final Answer) before calling the booking or cancellation tool, even if you already have all required information.
 
 --- PREVIOUS CONVERSATION ---
 {conversation}
