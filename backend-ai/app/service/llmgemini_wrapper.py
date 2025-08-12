@@ -3,7 +3,7 @@ from langchain.llms.base import LLM
 from typing import Optional, List, Dict, Any
 import openai
 from google import genai
-class LMStudioLLM(LLM):
+class GeminiLLM(LLM):
     model_name: str = Field(...)  # bắt buộc truyền
     api_key: str = Field(...)
     _client: Any = PrivateAttr()

@@ -10,8 +10,8 @@ from app.prompt import create_prompt
 class AgentTogetherService:
     def __init__(self):
         self.llm =  ChatTogether(
-            together_api_key= API_KEY,
-            model=LLM_MODEL_NAME
+            together_api_key= TOGETHER_API_KEY,
+            model=TOGETHER_LLM_MODEL_NAME
         )
         self.agent = initialize_agent(
             tools=tools,

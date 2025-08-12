@@ -96,12 +96,17 @@ A list of rooms in the following format:
 create_simple_schedule_prompt = """
 Use this tool to **create a simple schedule** (without participants or departments).
 
+Rules for determining type:
+- If `roomName` is provided → type is automatically "OFFLINE".
+- If `roomName` is not provided → type is automatically "ONLINE".
+- The user does not need to provide the `type` field.
+
 Required input (JSON format):
 - title: string (e.g., "Weekly Meeting")
-- type: "ONLINE" or "OFFLINE"
 - startTime: ISO format datetime (e.g., "2025-07-25T14:00:00")
 - endTime: ISO format datetime (e.g., "2025-07-25T15:00:00")
-- roomName: string (required **only if type is OFFLINE**)
+- roomName: string (optional, but required for OFFLINE)
+- type: (automatically assigned by the agent based on the above rules)
 
 Example (OFFLINE):
 {{
