@@ -4,7 +4,7 @@ from app.prompt import *
 import requests
 from config import *
 import redis
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.from_url(REDIS_URL)
 
 def check_room_available(input_str):
     try:
@@ -335,8 +335,14 @@ def clean_json_input(raw: str) -> str:
     return "\n".join(lines).strip()
 from datetime import datetime
 def get_current_time(input_str=None):
-    return datetime.now().strftime("%A, %d %B %Y, %H:%M:%S")
-
+    try:
+        url = f"{SCHEDULE_API}/time"  # URL tới endpoint Java
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()  # nếu HTTP lỗi → raise exception
+        return response.text  # Java trả về chuỗi format sẵn
+    except Exception as e:
+        print("Lỗi khi gọi API thời gian:", e)
+        return None
 tools = [
     Tool(
         name="CheckRoomAvailable",

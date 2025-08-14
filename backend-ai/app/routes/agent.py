@@ -1,4 +1,5 @@
 # routes/users.py
+from config import *
 from flask import Blueprint, jsonify, request
 from app.core import inject
 from app.service import AgentService
@@ -8,7 +9,6 @@ import time
 import logging
 from datetime import datetime
 import os
-
 # ANSI màu cho console
 RED = "\033[91m"
 GREEN = "\033[92m"
@@ -27,7 +27,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.from_url(REDIS_URL)
 bp = Blueprint('users', __name__)
 
 @bp.route('/chat', methods=['POST'])
@@ -51,7 +51,7 @@ def chat(agent_service: AgentService):
     ai_message = agent_service.chat(conversation, keycloak_id)
 
     try:
-        callback_url = f"http://localhost:8080/ai-agent/sse/callback?keycloakId={keycloak_id}"
+        callback_url = f"{SCHEDULE_API}/ai-agent/sse/callback?keycloakId={keycloak_id}"
         response = requests.post(callback_url, json={"aiMessage": ai_message})
         response.raise_for_status()
     except requests.RequestException as e:

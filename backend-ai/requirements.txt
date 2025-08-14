@@ -1,0 +1,8 @@
+google-genai
+flask
+langchain
+langchain-together
+pydantic
+openai
+redis
+flask-cors
