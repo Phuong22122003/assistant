@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: agent-service
 spec:
+  type: LoadBalancer
   selector:
     app: agent-service
   ports:

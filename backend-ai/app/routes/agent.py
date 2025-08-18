@@ -9,12 +9,12 @@ import time
 import logging
 from datetime import datetime
 import os
-# ANSI màu cho console
+# ANSI console color
 RED = "\033[91m"
 GREEN = "\033[92m"
 RESET = "\033[0m"
 
-# Cấu hình logging file
+# logging file config
 log_dir = "logs"
 os.makedirs(log_dir, exist_ok=True)
 log_file = os.path.join(log_dir, "chat.log")
@@ -22,7 +22,7 @@ log_file = os.path.join(log_dir, "chat.log")
 logging.basicConfig(
     filename=log_file,
     filemode="a",
-    encoding="utf-8",  # 🔹 Thêm dòng này để hỗ trợ tiếng Việt
+    encoding="utf-8", 
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
@@ -47,7 +47,6 @@ def chat(agent_service: AgentService):
 
     if conversation is None:
         return jsonify({'error': 'Missing "conversation" field in request body'}), 400
-
     ai_message = agent_service.chat(conversation, keycloak_id)
 
     try:
@@ -69,7 +68,6 @@ def chat(agent_service: AgentService):
     print(f"   ⚡ Response Time: {elapsed_time:.2f} ms")
     print(f"{RED}{'='*26} END TIME {'='*26}{RESET}\n")
 
-    # Ghi file log có phân tách và thời gian
     logging.info("\n" + "="*70)
     logging.info(f"START TIME: {now_str}")
     logging.info(f"Keycloak ID: {keycloak_id}")

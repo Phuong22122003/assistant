@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: agent-service
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: agent-service
@@ -23,3 +23,28 @@ spec:
               value: redis://192.168.1.165:6379/0 # ipconfig
             - name: SCHEDULE_SERVICE_URL
               value: http://192.168.1.165:8080  # ipconfig
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "500m"
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agent-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agent-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
