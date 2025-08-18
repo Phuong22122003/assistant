@@ -3,6 +3,7 @@ from langchain.llms.base import LLM
 from typing import Optional, List, Dict, Any
 import openai
 from google import genai
+import time
 class GeminiLLM(LLM):
     model_name: str = Field(...)  # bắt buộc truyền
     api_key: str = Field(...)
@@ -16,11 +17,16 @@ class GeminiLLM(LLM):
         return "lm_studio"
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
-        response = self._client.models.generate_content(
-            model=self.model_name, 
-            contents= prompt
-            )
-        return response.text
+        # response = self._client.models.generate_content(
+        #     model=self.model_name, 
+        #     contents= prompt
+        #     )
+        # return response.text
+    
+        time.sleep(7)
+        
+        return "Final Answer: <your response to the user>"
+    
     @property
     def _identifying_params(self) -> Dict[str, Any]:
         return {"model_name": self.model_name}
