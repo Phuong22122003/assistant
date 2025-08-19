@@ -92,6 +92,50 @@ A list of rooms in the following format:
   ...
 ]
 """
+get_all_meetings_prompt = """
+Use this tool to retrieve all meeting schedules for a given user.
+Input: 
+{{
+  "keycloak_id":"..."
+}}
+Output:
+Return a list of meetings the user is participating in. Each meeting should be in the following JSON format:
+
+[
+    {{
+        "scheduleId": 1073741824,
+        "title": "string",
+        "type": "OFFLINE",
+        "startTime": "2025-08-19T14:49:13.994Z",
+        "endTime": "2025-08-19T14:49:13.994Z",
+        "room": {{
+            "name": "string",
+            "location": "string",
+            "capacity": 1073741824
+        }},
+        "participants": [
+            {{
+                "userId": 1073741824,
+                "keycloakId": "string",
+                "username": "string",
+                "firstname": "string",
+                "lastname": "string",
+                "dob": "2025-08-19",
+                "email": "string",
+                "department": {{
+                    "departmentId": "string",
+                    "name": "string"
+                }}
+            }}
+        ]
+    }}
+]
+
+Important:
+- Only include meetings where the given keycloak_id is a participant.
+- Return the full meeting list as a JSON array.
+"""
+
 
 create_simple_schedule_prompt = """
 Use this tool to **create a simple schedule** (without participants or departments).

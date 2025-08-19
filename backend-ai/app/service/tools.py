@@ -79,6 +79,26 @@ def get_all_rooms(input_str):
         return rooms
     except json.JSONDecodeError as e:
         print("Invalid JSON format:", e)
+def get_all_meetings(input_str):
+    try:
+        input_data = json.loads(clean_json_input(input_str))
+        keycloak_id =input_data['keycloak_id']
+        JWT_TOKEN = r.get(keycloak_id)
+        if JWT_TOKEN is not None:
+            JWT_TOKEN = JWT_TOKEN.decode('utf-8')
+
+        URL = f"{SCHEDULE_API}/schedules/users/{keycloak_id}"
+
+        headers = {
+            "Authorization": f"Bearer {JWT_TOKEN}",
+        }
+        response = requests.get(URL, headers=headers)
+        json_data = response.json()  # Parse response JSON
+
+        rooms = str(json_data)
+        return rooms
+    except json.JSONDecodeError as e:
+        print("Invalid JSON format:", e)
 
 def schedule_room_booking(input_str: str): 
     try:
@@ -403,5 +423,10 @@ tools = [
         name="GetCompanyPolicy",
         func=read_company_policy,
         description=read_company_policy_prompt
+    ),
+    Tool(
+        name="GetAllMetting",
+        func=get_all_meetings,
+        description=get_all_meetings_prompt
     )
 ]
