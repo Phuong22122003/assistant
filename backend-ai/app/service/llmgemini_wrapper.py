@@ -17,15 +17,11 @@ class GeminiLLM(LLM):
         return "lm_studio"
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
-        # response = self._client.models.generate_content(
-        #     model=self.model_name, 
-        #     contents= prompt
-        #     )
-        # return response.text
-    
-        time.sleep(7)
-        
-        return "Final Answer: <your response to the user>"
+        response = self._client.models.generate_content(
+            model=self.model_name, 
+            contents= prompt
+            )
+        return response.text
     
     @property
     def _identifying_params(self) -> Dict[str, Any]:
